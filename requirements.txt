@@ -4,5 +4,5 @@ Flask-Bcrypt
 Flask-JWT-Extended
 Flask-Testing
 Flask-cors
-python-dotenv
+python-dotenvpi
 requests
