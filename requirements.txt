@@ -6,3 +6,9 @@ Flask-Testing
 Flask-cors
 python-dotenvpi
 requests
+gunicorn
+hypercorn
+grpcio
+grpcio-tools
+hypercorn
+asgiref

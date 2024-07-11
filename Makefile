@@ -16,6 +16,16 @@ activate:
 run:
 	FLASK_APP=$(FLASK_APP) FLASK_ENV=$(FLASK_ENV) $(VENV)/bin/flask run
 
+# run guinicorn
+run-gunicorn:
+	FLASK_APP=$(FLASK_APP) FLASK_ENV=$(FLASK_ENV) $(VENV)/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:5000 run:app
+
+run-asgi:
+	hypercorn asgi:app -b 0.0.0.0:5000 --log-level info --access-log - --error-log - --reload
+	# hypercorn asgi:app -b 0.0.0.0:5000 --log-config logging.conf --error-log -
+	# hypercorn asgi:app -b 0.0.0.0:5000  --log-config logging.conf --error-log -
+	
+
 # Run tests
 test:
 	FLASK_APP=$(FLASK_APP) FLASK_ENV=testing $(VENV)/bin/python -m unittest discover tests
@@ -50,7 +60,7 @@ install:
 
 # Freeze requirements
 freeze:
-	$(VENV)/bin/pip freeze > requirements.txt
+	$(VENV)/bin/pip freeze > requirements.lock.txt
 
 # Help command
 help:
