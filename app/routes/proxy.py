@@ -23,9 +23,8 @@ logger = logging.getLogger(__name__)
 @jwt_required()
 def proxy(path):
 
-
     user_id = get_jwt_identity()
-    print("user_id: ", user_id)
+
     if not user_has_access(user_id, path):
         return Response('Forbidden', status=403)
 
@@ -44,11 +43,16 @@ def proxy(path):
         job_id = str(uuid.uuid4()) + "-" + str(user_id)
         
         # override job_id set by the user if it exists, or set a custom one
-        data = request.get_json()
         data.update({"job_id": job_id})
 
     if request.headers.get('Content-Type') == 'application/grpc':
         return proxy_grpc(url, headers)
+
+    # query arguments for get
+    query_args = urllib.parse.urlencode(request.args)
+    if query_args:
+        url += f"?{query_args}"
+    print("query args: ", query_args, request.args)
 
     response = requests.request(
         method=request.method,
