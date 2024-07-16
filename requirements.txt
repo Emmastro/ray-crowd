@@ -4,6 +4,7 @@ Flask-Bcrypt
 Flask-JWT-Extended
 Flask-Testing
 Flask-cors
+Flask-Migrate
 python-dotenv
 requests
 gunicorn
