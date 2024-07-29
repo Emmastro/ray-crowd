@@ -1,6 +1,9 @@
+from dataclasses import dataclass
+
 from .extensions import db, bcrypt
 from datetime import datetime
 
+@dataclass
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -9,10 +12,12 @@ class Role(db.Model):
     def __repr__(self):
         return f'<Role {self.name}>'
 
+@dataclass
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
+    
     password = db.Column(db.String(150), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
@@ -43,34 +48,33 @@ class User(db.Model):
             self._date_of_birth = None
         elif isinstance(value, str):
             self._date_of_birth = datetime.strptime(value, '%Y-%m-%d').date()
-        elif isinstance(value, date):
+        elif isinstance(value, datetime.date):
             self._date_of_birth = value
         else:
             self._date_of_birth = None
 
-class Job(db.Model):
-    __tablename__ = 'jobs'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    owner = db.relationship('User', backref=db.backref('jobs', lazy=True))
-    state_id = db.Column(db.Integer, db.ForeignKey('job_states.id'), nullable=False)
-    state = db.relationship('JobState', backref=db.backref('jobs', lazy=True))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+@dataclass
+class Project(db.Model):
+    __tablename__ = 'projects'
+    author: str
+    project_id: int = db.Column(db.Integer, primary_key=True, )
+    title: str = db.Column(db.String(150), nullable=False)
+    description: str = db.Column(db.Text, nullable=True)
+    topic: str = db.Column(db.String(100), nullable=False)
+    is_public: bool = db.Column(db.Boolean, default=False, nullable=False)
+    owner_id: int = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    owner = db.relationship('User', backref=db.backref('projects', lazy=True))
+    created_at: datetime = db.Column(db.DateTime, default=datetime.now(), nullable=False)
+    updated_at: datetime = db.Column(db.DateTime, default=datetime.now(), onupdate=datetime.now(), nullable=False)
 
     def __repr__(self):
-        return f'<Job {self.name}>'
+        return f'<Project {self.title}>'
+    
+    @property
+    def author(self):
+        return self.owner.username
 
-class JobState(db.Model):
-    __tablename__ = 'job_states'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-
-    def __repr__(self):
-        return f'<JobState {self.name}>'
-
+@dataclass
 class Permission(db.Model):
     __tablename__ = 'permissions'
     id = db.Column(db.Integer, primary_key=True)
@@ -79,6 +83,7 @@ class Permission(db.Model):
     def __repr__(self):
         return f'<Permission {self.name}>'
 
+@dataclass
 class RolePermission(db.Model):
     __tablename__ = 'role_permissions'
     id = db.Column(db.Integer, primary_key=True)
@@ -90,6 +95,7 @@ class RolePermission(db.Model):
     def __repr__(self):
         return f'<RolePermission Role: {self.role.name}, Permission: {self.permission.name}>'
 
+@dataclass
 class TokenBlocklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(36), nullable=False)
@@ -97,3 +103,5 @@ class TokenBlocklist(db.Model):
 
     def __repr__(self):
         return f'<TokenBlocklist {self.jti}>'
+
+

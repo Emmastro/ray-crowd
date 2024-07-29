@@ -1,0 +1,93 @@
+{
+  "roles": [
+    {
+      "name": "Researcher",
+      "permissions": ["submit_jobs", "view_own_jobs"]
+    },
+    {
+      "name": "Contributor",
+      "permissions": ["donate_computing_power"]
+    },
+    {
+      "name": "Admin",
+      "permissions": [
+        "submit_jobs",
+        "view_own_jobs",
+        "donate_computing_power",
+        "manage_cluster",
+        "view_all_jobs"
+      ]
+    }
+  ],
+  "permissions": [
+    "submit_jobs",
+    "view_own_jobs",
+    "donate_computing_power",
+    "manage_cluster",
+    "view_all_jobs"
+  ],
+  "users": [
+    {
+      "username": "john_doe",
+      "password": "password123",
+      "role": "Researcher",
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john_doe@example.com",
+      "gender": "Male",
+      "date_of_birth": "1980-01-01",
+      "country": "USA",
+      "research_interests": "Machine Learning",
+      "is_active": true
+    },
+    {
+      "username": "jane_smith",
+      "password": "password456",
+      "role": "Contributor",
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "email": "jane_smith@example.com",
+      "gender": "Female",
+      "date_of_birth": "1985-02-02",
+      "country": "Canada",
+      "research_interests": "Data Science",
+      "is_active": true
+    },
+    {
+      "username": "admin_user",
+      "password": "adminpass",
+      "role": "Admin",
+      "first_name": "Admin",
+      "last_name": "User",
+      "email": "admin@example.com",
+      "gender": "Non-binary",
+      "date_of_birth": "1975-03-03",
+      "country": "UK",
+      "research_interests": "AI Governance",
+      "is_active": true
+    }
+  ],
+  "projects": [
+    {
+      "title": "Project Alpha",
+      "description": "Research on alpha particles.",
+      "topic": "Physics",
+      "is_public": true,
+      "owner": "john_doe"
+    },
+    {
+      "title": "Project Beta",
+      "description": "Exploring beta decay.",
+      "topic": "Chemistry",
+      "is_public": false,
+      "owner": "jane_smith"
+    },
+    {
+      "title": "Project Gamma",
+      "description": "Gamma ray research.",
+      "topic": "Astrophysics",
+      "is_public": true,
+      "owner": "admin_user"
+    }
+  ]
+}
