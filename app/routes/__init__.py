@@ -7,6 +7,6 @@ from .projects import project_bp
 
 def register_blueprints(app: Flask):
     app.register_blueprint(auth_bp)
+    app.register_blueprint(project_bp)
     app.register_blueprint(proxy_bp)
     app.register_blueprint(version_bp)
-    app.register_blueprint(project_bp)

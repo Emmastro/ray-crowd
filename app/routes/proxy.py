@@ -1,14 +1,19 @@
 import logging
+import os
 import uuid
 from flask import Blueprint, request, Response
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from werkzeug.utils import secure_filename
 import json
 import requests
 import urllib.parse
 
+from app.models import Job, Project, db
+
 proxy_bp = Blueprint('proxy', __name__)
 
 RAY_DASHBOARD_URL = 'http://localhost:8265'
+UPLOAD_FOLDER = "uploads" 
 
 # Set up logging
 logging.basicConfig(
@@ -39,11 +44,32 @@ def proxy(path):
         data = request.get_json()
 
     if path == "api/jobs/" and request.method == "POST":
+
+        # if "file" in request.files:
+        #     file = request.files["file"]
+        #     filename = secure_filename(file.filename)
+        #     file_path = os.path.join(UPLOAD_FOLDER, filename)
+        #     file.save(file_path)
+        #     # data.update({"file_path": file_path})
+
+        # os.system(f"python {file_path}")
+
         # Generate Job Id including the user_id at the end (uuid-user_id)
-        job_id = str(uuid.uuid4()) + "-" + str(user_id)
+        submission_id = str(uuid.uuid4()) + "-" + str(user_id)
         
         # override job_id set by the user if it exists, or set a custom one
-        data.update({"job_id": job_id})
+        data.update({"submission_id": submission_id})
+
+        # check if the project exists
+
+        project_id = data.get("metadata").get("project_id")
+        if project_id:
+            # check if the project exists
+            # change project_id type to uuid
+            project_id = uuid.UUID(project_id)
+            project = Project.query.get(project_id)
+            if not project:
+                return Response({"message": 'Project not found'}, status=404)
 
     if request.headers.get('Content-Type') == 'application/grpc':
         return proxy_grpc(url, headers)
@@ -52,7 +78,8 @@ def proxy(path):
     query_args = urllib.parse.urlencode(request.args)
     if query_args:
         url += f"?{query_args}"
-    print("query args: ", query_args, request.args)
+
+    headers['User-Agent'] = 'CustomAPIClient/1.0'
 
     response = requests.request(
         method=request.method,
@@ -63,7 +90,14 @@ def proxy(path):
         allow_redirects=False,
     )
 
-    # TODO: review this
+    if path == "api/jobs/" and request.method == "POST":
+        # create a job with the response
+        job = Job(
+            submission_id=submission_id,
+            project_id=project_id,
+        )
+        db.session.add(job)
+    
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for name, value in response.raw.headers.items() if name.lower() not in excluded_headers]
 

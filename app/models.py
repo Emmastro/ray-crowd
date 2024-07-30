@@ -1,3 +1,6 @@
+import uuid
+
+
 from dataclasses import dataclass
 
 from .extensions import db, bcrypt
@@ -57,7 +60,7 @@ class User(db.Model):
 class Project(db.Model):
     __tablename__ = 'projects'
     author: str
-    project_id: int = db.Column(db.Integer, primary_key=True, )
+    project_id: int = db.Column(db.Uuid, primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     title: str = db.Column(db.String(150), nullable=False)
     description: str = db.Column(db.Text, nullable=True)
     topic: str = db.Column(db.String(100), nullable=False)
@@ -105,3 +108,8 @@ class TokenBlocklist(db.Model):
         return f'<TokenBlocklist {self.jti}>'
 
 
+@dataclass
+class Job(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    submission_id = db.Column(db.String(36), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('projects.project_id'), nullable=False)

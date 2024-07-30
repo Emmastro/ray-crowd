@@ -42,6 +42,10 @@ db-migrate:
 db-upgrade:
 	FLASK_APP=$(FLASK_APP) $(VENV)/bin/flask db upgrade
 
+db-delete:
+	rm -rf migrations
+	rm instance/app.db
+
 # Run all database commands
 db:
 	make db-init
